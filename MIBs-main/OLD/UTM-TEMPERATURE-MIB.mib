@@ -1,0 +1,83 @@
+UTM-TEMPERATURE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE              FROM RFC-1212
+
+	temperatureInfo          FROM UTM-MIB;
+
+	DisplayString  ::= OCTET STRING
+
+-- =================== thermTable ===================
+
+	thermNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of temperature sensors present on this platform."
+        ::= { temperatureInfo 1 }
+
+	thermLowerThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The lower threshold of permissible temperature"
+        ::= { temperatureInfo 2 }
+
+	thermUpperThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The upper threshold of permissible temperature"
+        ::= { temperatureInfo 3 }
+
+	thermTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ThermEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"Table of sensors"
+		::= { temperatureInfo 4 }
+
+	thermEntry OBJECT-TYPE
+		SYNTAX  ThermEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"An entry containing information about particular sensor."
+		INDEX { thermName }
+		::= { thermTable 1 }
+
+	ThermEntry ::=
+		SEQUENCE {
+			thermName                  DisplayString,
+			thermValue                 INTEGER,
+			thermUnit                  DisplayString
+		}
+
+		thermName OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"Name of the sensor"
+			::= { thermEntry 1 }
+
+		thermValue OBJECT-TYPE
+			SYNTAX  INTEGER
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"Temperature value measured on the sensor"
+			::= { thermEntry 2 }
+
+		thermUnit OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"Measurement unit of the temperature"
+			::= { thermEntry 3 }
+END

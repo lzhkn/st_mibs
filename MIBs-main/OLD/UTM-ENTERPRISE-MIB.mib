@@ -1,0 +1,10 @@
+UTM-ENTERPRISE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE   FROM SNMPv2-SMI
+    enterprises   FROM RFC1155-SMI;
+
+entensys OBJECT IDENTIFIER ::= { enterprises 45741 }
+utm-4    OBJECT IDENTIFIER ::= { entensys 2 }
+
+END

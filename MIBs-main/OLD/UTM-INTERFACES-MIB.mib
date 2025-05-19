@@ -1,0 +1,805 @@
+UTM-INTERFACES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	mgmt, IpAddress,
+	TimeTicks                FROM RFC1155-SMI
+
+	OBJECT-TYPE              FROM RFC-1212
+
+	ip, system,
+	interfaces               FROM RFC1213-MIB
+
+	Counter32, Gauge32,
+	Integer32, Counter64,
+	mib-2                    FROM SNMPv2-SMI
+
+	TruthValue               FROM SNMPv2-TC;
+
+	DisplayString  ::= OCTET STRING
+	PhysAddress    ::= OCTET STRING
+
+	ifMib        OBJECT IDENTIFIER ::= { mib-2 31 }
+	ifMIBObjects OBJECT IDENTIFIER ::= { ifMib 1  }
+
+	ifNumber OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of network interfaces (regardless of
+			their current state) present on this system."
+		::= { interfaces 1 }
+
+-- ================ IfTable redefinition ===================
+
+	ifTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF IfEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of interface entries.  The number of
+			entries is given by the value of ifNumber."
+		::= { interfaces 2 }
+
+	ifEntry OBJECT-TYPE
+		SYNTAX  IfEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"An interface entry containing objects at the
+			subnetwork layer and below for a particular
+			interface."
+		INDEX   { ifIndex }
+		::= { ifTable 1 }
+ 
+	IfEntry ::= SEQUENCE {
+		ifIndex              INTEGER,
+		ifDescr              DisplayString,
+		ifType               INTEGER,
+		ifMtu                INTEGER,
+		ifSpeed              Gauge32,
+		ifPhysAddress        PhysAddress,
+		ifAdminStatus        INTEGER,
+		ifOperStatus         INTEGER,
+		ifLastChange         TimeTicks,
+		ifInOctets           Counter32,
+		ifInUcastPkts        Counter32,
+		ifInNUcastPkts       Counter32,
+		ifInDiscards         Counter32,
+		ifInErrors           Counter32,
+		ifInUnknownProtos    Counter32,
+		ifOutOctets          Counter32,
+		ifOutUcastPkts       Counter32,
+		ifOutNUcastPkts      Counter32,
+		ifOutDiscards        Counter32,
+		ifOutErrors          Counter32,
+		ifOutQLen            Gauge32,
+        ifSpecific           OBJECT IDENTIFIER
+	}
+
+	ifIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"A unique value for each interface.  Its value
+			ranges between 1 and the value of ifNumber.  The
+			value for each interface must remain constant at
+			least from one re-initialization of the entity's
+			network management system to the next re-
+			initialization."
+		::= { ifEntry 1 }
+ 
+	ifDescr OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..255))
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"A textual string containing information about the
+			interface.  This string should include the name of
+			the manufacturer, the product name and the version
+			of the hardware interface."
+		::= { ifEntry 2 }
+ 
+	ifType OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			regular1822(2),
+			hdh1822(3),
+			ddn-x25(4),
+			rfc877-x25(5),
+			ethernet-csmacd(6),
+			iso88023-csmacd(7),
+			iso88024-tokenBus(8),
+			iso88025-tokenRing(9),
+			iso88026-man(10),
+			starLan(11),
+			proteon-10Mbit(12),
+			proteon-80Mbit(13),
+			hyperchannel(14),
+			fddi(15),
+			lapb(16),
+			sdlc(17),
+			ds1(18),           -- T-1
+			e1(19),            -- european equiv. of T-1
+			basicISDN(20),
+			primaryISDN(21),   -- proprietary serial
+			propPointToPointSerial(22),
+			ppp(23),
+			softwareLoopback(24),
+			eon(25),            -- CLNP over IP [11]
+			ethernet-3Mbit(26),
+			nsip(27),           -- XNS over IP
+			slip(28),           -- generic SLIP
+			ultra(29),          -- ULTRA technologies
+			ds3(30),            -- T-3
+			sip(31),            -- SMDS
+			frame-relay(32)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The type of interface, distinguished according to
+			the physical/link protocol(s) immediately `below'
+			the network layer in the protocol stack."
+		::= { ifEntry 3 }
+ 
+	ifMtu OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The size of the largest datagram which can be
+			sent/received on the interface, specified in
+			octets.  For interfaces that are used for
+			transmitting network datagrams, this is the size
+			of the largest network datagram that can be sent
+			on the interface."
+		::= { ifEntry 4 }
+ 
+	ifSpeed OBJECT-TYPE
+		SYNTAX  Gauge32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"An estimate of the interface's current bandwidth
+			in bits per second.  For interfaces which do not
+			vary in bandwidth or for those where no accurate
+			estimation can be made, this object should contain
+			the nominal bandwidth."
+		::= { ifEntry 5 }
+
+	ifPhysAddress OBJECT-TYPE
+		SYNTAX  PhysAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The interface's address at the protocol layer
+			immediately `below' the network layer in the
+			protocol stack.  For interfaces which do not have
+			such an address (e.g., a serial line), this object
+			should contain an octet string of zero length."
+		::= { ifEntry 6 }
+ 
+	ifAdminStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			up(1),       -- ready to pass packets
+			down(2),
+			testing(3)   -- in some test mode
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The desired state of the interface.  The
+			testing(3) state indicates that no operational
+			packets can be passed."
+		::= { ifEntry 7 }
+ 
+		ifOperStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			up(1),       -- ready to pass packets
+			down(2),
+			testing(3),   -- in some test mode
+			unknown(4),
+			dormant(5),
+			notPresent(6),
+			lowerLayerDown(7)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The current operational state of the interface.
+			The testing(3) state indicates that no operational
+			packets can be passed."
+		::= { ifEntry 8 }
+ 
+	ifLastChange OBJECT-TYPE
+		SYNTAX  TimeTicks
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The value of sysUpTime at the time the interface
+			entered its current operational state.  If the
+			current state was entered prior to the last re-
+			initialization of the local network management
+			subsystem, then this object contains a zero
+			value."
+		::= { ifEntry 9 }
+	 
+	ifInOctets OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of octets received on the
+			interface, including framing characters."
+		::= { ifEntry 10 }
+ 
+	ifInUcastPkts OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of subnetwork-unicast packets
+			delivered to a higher-layer protocol."
+		::= { ifEntry 11 }
+ 
+	ifInNUcastPkts OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of non-unicast (i.e., subnetwork-
+			broadcast or subnetwork-multicast) packets
+			delivered to a higher-layer protocol."
+		::= { ifEntry 12 }
+ 
+	ifInDiscards OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of inbound packets which were chosen
+			to be discarded even though no errors had been
+			detected to prevent their being deliverable to a
+			higher-layer protocol.  One possible reason for
+			discarding such a packet could be to free up
+			buffer space."
+		::= { ifEntry 13 }
+ 
+	ifInErrors OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of inbound packets that contained
+			errors preventing them from being deliverable to a
+			higher-layer protocol."
+		::= { ifEntry 14 }
+
+	ifInUnknownProtos OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of packets received via the interface
+			which were discarded because of an unknown or
+			unsupported protocol."
+		::= { ifEntry 15 }
+ 
+	ifOutOctets OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of octets transmitted out of the
+			interface, including framing characters."
+		::= { ifEntry 16 }
+
+	ifOutUcastPkts OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of packets that higher-level
+			protocols requested be transmitted to a
+			subnetwork-unicast address, including those that
+			were discarded or not sent."
+		::= { ifEntry 17 }
+ 
+	ifOutNUcastPkts OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of packets that higher-level
+			protocols requested be transmitted to a non-
+			unicast (i.e., a subnetwork-broadcast or
+			subnetwork-multicast) address, including those
+			that were discarded or not sent."
+		::= { ifEntry 18 }
+ 
+	ifOutDiscards OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of outbound packets which were chosen
+			to be discarded even though no errors had been
+			detected to prevent their being transmitted.  One
+			possible reason for discarding such a packet could
+			be to free up buffer space."
+		::= { ifEntry 19 }
+ 
+	ifOutErrors OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of outbound packets that could not be
+			transmitted because of errors."
+		::= { ifEntry 20 }
+ 
+	ifOutQLen OBJECT-TYPE
+		SYNTAX  Gauge32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The length of the output packet queue (in packets)."
+		::= { ifEntry 21 }
+
+	ifSpecific OBJECT-TYPE
+		SYNTAX  OBJECT IDENTIFIER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"A reference to MIB definitions specific to the
+			particular media being used to realize the
+			interface.  For example, if the interface is
+			realized by an ethernet, then the value of this
+			object refers to a document defining objects
+			specific to ethernet.  If this information is not
+			present, its value should be set to the OBJECT
+			IDENTIFIER { 0 0 }, which is a syntatically valid
+			object identifier, and any conformant
+			implementation of ASN.1 and BER must be able to
+			generate and recognize this value."
+		::= { ifEntry 22 }
+
+-- ================ ipAddressTable redefinition ===================
+
+	ipAddrTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF IpAddrEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"The table of addressing information relevant to
+			this entity's IP addresses."
+		::= { ip 20 }
+
+	ipAddrEntry OBJECT-TYPE
+		SYNTAX  IpAddrEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"The addressing information for one of this
+			entity's IP addresses."
+		INDEX   { ipAdEntAddr }
+		::= { ipAddrTable 1 }
+
+	IpAddrEntry ::=
+		SEQUENCE {
+			ipAdEntAddr           IpAddress,
+			ipAdEntIfIndex        INTEGER,
+			ipAdEntNetMask        IpAddress,
+			ipAdEntBcastAddr      INTEGER,
+			ipAdEntReasmMaxSize   INTEGER (0..65535)
+		}
+              
+	ipAdEntAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The IP address to which this entry's addressing
+			information pertains."
+		::= { ipAddrEntry 1 }
+
+	ipAdEntIfIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index value which uniquely identifies the
+			interface to which this entry is applicable.  The
+			interface identified by a particular value of this
+			index is the same interface as identified by the
+			same value of ifIndex."
+		::= { ipAddrEntry 2 }
+
+	ipAdEntNetMask OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The subnet mask associated with the IP address of
+			this entry.  The value of the mask is an IP
+			address with all the network bits set to 1 and all
+			the hosts bits set to 0."
+		::= { ipAddrEntry 3 }
+
+	ipAdEntBcastAddr OBJECT-TYPE
+		SYNTAX  INTEGER (0..1)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The value of the least-significant bit in the IP
+			broadcast address used for sending datagrams on
+			the (logical) interface associated with the IP
+			address of this entry.  For example, when the
+			Internet standard all-ones broadcast address is
+			used, the value will be 1.  This value applies to
+			both the subnet and network broadcasts addresses
+			used by the entity on this (logical) interface."
+		::= { ipAddrEntry 4 }
+
+	ipAdEntReasmMaxSize OBJECT-TYPE
+		SYNTAX  INTEGER (0..65535)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The size of the largest IP datagram which this
+			entity can re-assemble from incoming IP fragmented
+			datagrams received on this interface."
+		::= { ipAddrEntry 5 }
+
+-- ================ IfXTable redefinition ===================
+
+	ifXTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF IfXEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of interface entries.  The number of entries is
+			given by the value of ifNumber.  This table contains
+			additional objects for the interface table."
+		::= { ifMIBObjects 1 }
+
+	ifXEntry OBJECT-TYPE
+		SYNTAX  IfXEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"An entry containing additional management information
+			applicable to a particular interface."
+		INDEX { ifName }
+		::= { ifXTable 1 }
+
+	IfXEntry ::=
+		SEQUENCE {
+			ifName                     DisplayString,
+			ifInMulticastPkts          Counter32,
+			ifInBroadcastPkts          Counter32,
+			ifOutMulticastPkts         Counter32,
+			ifOutBroadcastPkts         Counter32,
+			ifHCInOctets               Counter64,
+			ifHCInUcastPkts            Counter64,
+			ifHCInMulticastPkts        Counter64,
+			ifHCInBroadcastPkts        Counter64,
+			ifHCOutOctets              Counter64,
+			ifHCOutUcastPkts           Counter64,
+			ifHCOutMulticastPkts       Counter64,
+			ifHCOutBroadcastPkts       Counter64,
+			ifLinkUpDownTrapEnable     INTEGER,
+			ifHighSpeed                Gauge32,
+			ifPromiscuousMode          TruthValue,
+			ifConnectorPresent         TruthValue,
+			ifAlias                    DisplayString,
+			ifCounterDiscontinuityTime TimeTicks
+		}
+
+		ifName OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"The textual name of the interface.  The value of this
+				object should be the name of the interface as assigned by
+				the local device and should be suitable for use in commands
+				entered at the device's `console'.  This might be a text
+				name, such as `le0' or a simple port number, such as `1',
+				depending on the interface naming syntax of the device.  If
+				several entries in the ifTable together represent a single
+				interface as named by the device, then each will have the
+				same value of ifName.  Note that for an agent which responds
+				to SNMP queries concerning an interface on some other
+				(proxied) device, then the value of ifName for such an
+				If there is no local name, or this object is otherwise not
+				applicable, then this object contains a zero-length string."
+			::= { ifXEntry 1 }
+
+	ifInMulticastPkts OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of packets, delivered by this sub-layer to a
+			higher (sub-)layer, which were addressed to a multicast
+			address at this sub-layer.  For a MAC layer protocol, this
+			includes both Group and Functional addresses.
+			re-initialization of the management system, and at other
+			times as indicated by the value of ifCounterDiscontinuityTime."
+		::= { ifXEntry 2 }
+
+	ifInBroadcastPkts OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of packets, delivered by this sub-layer to a
+			higher (sub-)layer, which were addressed to a broadcast
+			address at this sub-layer.
+			Discontinuities in the value of this counter can occur at
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 3 }
+
+	ifOutMulticastPkts OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of packets that higher-level protocols
+			requested be transmitted, and which were addressed to a
+			multicast address at this sub-layer, including those that
+			were discarded or not sent.  For a MAC layer protocol, this
+			includes both Group and Functional addresses.
+			Discontinuities in the value of this counter can occur at
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 4 }
+
+	ifOutBroadcastPkts OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of packets that higher-level protocols
+			requested be transmitted, and which were addressed to a
+			broadcast address at this sub-layer, including those that
+			were discarded or not sent.
+			Discontinuities in the value of this counter can occur at
+			re-initialization of the management system, and at other
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 5 }
+
+	--
+	-- High Capacity Counter objects.  These objects are all
+	-- 64 bit versions of the "basic" ifTable counters.  These
+	-- objects all have the same basic semantics as their 32-bit
+	-- counterparts, however, their syntax has been extended
+	-- to 64 bits.
+	--
+
+	ifHCInOctets OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of octets received on the interface,
+			including framing characters.  This object is a 64-bit
+			version of ifInOctets.
+			Discontinuities in the value of this counter can occur at
+			re-initialization of the management system, and at other
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 6 }
+
+	ifHCInUcastPkts OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of packets, delivered by this sub-layer to a
+			higher (sub-)layer, which were not addressed to a multicast
+			or broadcast address at this sub-layer.  This object is a
+			64-bit version of ifInUcastPkts.
+			Discontinuities in the value of this counter can occur at
+			re-initialization of the management system, and at other
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 7 }
+
+	ifHCInMulticastPkts OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of packets, delivered by this sub-layer to a
+			higher (sub-)layer, which were addressed to a multicast
+			address at this sub-layer.  For a MAC layer protocol, this
+			includes both Group and Functional addresses.  This object
+			is a 64-bit version of ifInMulticastPkts.
+			Discontinuities in the value of this counter can occur at
+			re-initialization of the management system, and at other
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 8 }
+
+	ifHCInBroadcastPkts OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The number of packets, delivered by this sub-layer to a
+			higher (sub-)layer, which were addressed to a broadcast
+			address at this sub-layer.  This object is a 64-bit version
+			of ifInBroadcastPkts.
+			Discontinuities in the value of this counter can occur at
+			re-initialization of the management system, and at other
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 9 }
+
+	ifHCOutOctets OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of octets transmitted out of the
+			interface, including framing characters.  This object is a
+			64-bit version of ifOutOctets.
+			Discontinuities in the value of this counter can occur at
+			re-initialization of the management system, and at other
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 10 }
+
+	ifHCOutUcastPkts OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of packets that higher-level protocols
+			requested be transmitted, and which were not addressed to a
+			multicast or broadcast address at this sub-layer, including
+			those that were discarded or not sent.  This object is a
+			64-bit version of ifOutUcastPkts.
+			Discontinuities in the value of this counter can occur at
+			re-initialization of the management system, and at other
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 11 }
+
+	ifHCOutMulticastPkts OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of packets that higher-level protocols
+			requested be transmitted, and which were addressed to a
+			multicast address at this sub-layer, including those that
+			were discarded or not sent.  For a MAC layer protocol, this
+			includes both Group and Functional addresses.  This object
+			is a 64-bit version of ifOutMulticastPkts.
+			Discontinuities in the value of this counter can occur at
+			re-initialization of the management system, and at other
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 12 }
+
+	ifHCOutBroadcastPkts OBJECT-TYPE
+		SYNTAX  Counter64
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of packets that higher-level protocols
+			requested be transmitted, and which were addressed to a
+			broadcast address at this sub-layer, including those that
+			were discarded or not sent.  This object is a 64-bit version
+			of ifOutBroadcastPkts.
+			Discontinuities in the value of this counter can occur at
+			re-initialization of the management system, and at other
+			times as indicated by the value of
+			ifCounterDiscontinuityTime."
+		::= { ifXEntry 13 }
+
+	ifLinkUpDownTrapEnable  OBJECT-TYPE
+		SYNTAX  INTEGER { enabled(1), disabled(2) }
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Indicates whether linkUp/linkDown traps should be generated
+			for this interface.
+			By default, this object should have the value enabled(1) for
+			interfaces which do not operate on 'top' of any other
+			interface (as defined in the ifStackTable), and disabled(2)
+			otherwise."
+		::= { ifXEntry 14 }
+
+	ifHighSpeed OBJECT-TYPE
+		SYNTAX  Gauge32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"An estimate of the interface's current bandwidth in units
+			of 1,000,000 bits per second.  If this object reports a
+			value of `n' then the speed of the interface is somewhere in
+			the range of `n-500,000' to `n+499,999'.  For interfaces
+			which do not vary in bandwidth or for those where no
+			accurate estimation can be made, this object should contain
+			the nominal bandwidth.  For a sub-layer which has no concept
+			of bandwidth, this object should be zero."
+		::= { ifXEntry 15 }
+
+	ifPromiscuousMode  OBJECT-TYPE
+		SYNTAX  TruthValue
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object has a value of false(2) if this interface only
+			accepts packets/frames that are addressed to this station.
+			This object has a value of true(1) when the station accepts
+			all packets/frames transmitted on the media.  The value
+			true(1) is only legal on certain types of media.  If legal,
+			setting this object to a value of true(1) may require the
+			interface to be reset before becoming effective.
+			The value of ifPromiscuousMode does not affect the reception
+			of broadcast and multicast packets/frames by the interface."
+		::= { ifXEntry 16 }
+
+		ifConnectorPresent   OBJECT-TYPE
+			SYNTAX  TruthValue
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"This object has the value 'true(1)' if the interface
+				sublayer has a physical connector and the value 'false(2)'
+				otherwise."
+		::= { ifXEntry 17 }
+
+	ifAlias   OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..64))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object is an 'alias' name for the interface as
+			specified by a network manager, and provides a non-volatile
+			'handle' for the interface.
+			On the first instantiation of an interface, the value of
+			ifAlias associated with that interface is the zero-length
+			string.  As and when a value is written into an instance of
+			ifAlias through a network management set operation, then the
+			agent must retain the supplied value in the ifAlias instance
+			associated with the same interface for as long as that
+			interface remains instantiated, including across all re-
+			initializations/reboots of the network management system,
+			including those which result in a change of the interface's
+			ifIndex value.
+			An example of the value which a network manager might store
+			in this object for a WAN interface is the (Telco's) circuit
+			number/identifier of the interface.
+			Some agents may support write-access only for interfaces
+			having particular values of ifType.  An agent which supports
+			write access to this object is required to keep the value in
+			non-volatile storage, but it may limit the length of new
+			values depending on how much storage is already occupied by
+			the current values for other interfaces."
+		::= { ifXEntry 18 }
+
+	ifCounterDiscontinuityTime OBJECT-TYPE
+		SYNTAX  TimeTicks
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The value of sysUpTime on the most recent occasion at which
+			any one or more of this interface's counters suffered a
+			discontinuity.  The relevant counters are the specific
+			instances associated with this interface of any Counter32 or
+			Counter64 object contained in the ifTable or ifXTable.  If
+			no such discontinuities have occurred since the last re-
+			initialization of the local management subsystem, then this
+			object contains a zero value."
+		::= { ifXEntry 19 }
+END

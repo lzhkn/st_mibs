@@ -1,0 +1,63 @@
+S-TERRA-CSP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Gauge32
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    enterprises
+            FROM SNMPv2-SMI
+    DateAndTime
+            FROM SNMPv2-TC;
+
+  STerraCSP OBJECT IDENTIFIER ::= { enterprises 31342 }
+
+  stProduct OBJECT IDENTIFIER ::= { STerraCSP 1 }
+
+  stNotifications OBJECT IDENTIFIER ::= { STerraCSP 2 }
+
+  stNotificationVars OBJECT IDENTIFIER ::= { STerraCSP 3 }
+
+  stGlobalStats OBJECT IDENTIFIER ::= { STerraCSP 4 }
+
+  stUserDefinedVars OBJECT IDENTIFIER ::= { STerraCSP 1000 }
+
+  -- Products
+
+  stGate OBJECT IDENTIFIER ::= { stProduct 1 }
+
+  stRVPN OBJECT IDENTIFIER ::= { stGate 1 }
+  stGate100 OBJECT IDENTIFIER ::= { stGate 2 }
+
+  stGateUserDefined OBJECT IDENTIFIER ::= { stGate 1000 }
+
+  -- Notifications
+
+  stNotificationsUserDefined OBJECT IDENTIFIER ::= { stNotifications 1000 }
+
+  -- Notification vars
+
+  stNotificationDateAndTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Date and time of notification"
+    ::= { stNotificationVars 1 }
+
+  -- Global statistics
+
+  stIpsecGlobalStats OBJECT IDENTIFIER ::= { stGlobalStats 1 }
+
+  -- IPsec global statistics
+
+  stIpSecGlobalActiveUnitTunnels OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of currently active IPsec Phase-2 Tunnels
+        with S-Terra Unit"
+    ::= { stIpsecGlobalStats 1 }
+
+END

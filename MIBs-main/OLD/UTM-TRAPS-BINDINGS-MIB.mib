@@ -1,0 +1,333 @@
+UTM-TRAPS-BINDINGS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY    FROM SNMPv2-SMI
+	OBJECT-GROUP       FROM SNMPv2-CONF
+	OBJECT-TYPE        FROM RFC-1212
+	DisplayString      FROM RFC1213-MIB
+	utm-4              FROM UTM-ENTERPRISE-MIB;
+
+utmTrapsBindings MODULE-IDENTITY
+    LAST-UPDATED "202202180600Z"
+    ORGANIZATION "ENTENSYS"
+    CONTACT-INFO "support@entensys.com"
+    DESCRIPTION "Some trap's binding variable definition.
+    Scheme:
+        utmTrapsBindings                   { utm-4 11 }
+        +- utmTrapsBindingsEntities            {1   }
+        |  +- utmSysBindings                   { 1  }
+        |  |  +- bindSessionsCounter           {  5 }
+        |  |  |  +- utmSessions                {   1}
+        |  |  |  +- utmSessionsMax             {   2}
+        |  |  +- bindUsersCounter              {  6 }
+        |  |  |  +- utmUsers                   {   1}
+        |  |  |  +- utmUsersMax                {   2}
+        |  |  +- bindDataPartionFSStatus       {  7 }
+        |  |  |  +- utmDataPartionFSStatus     {   1}
+        |  |  |
+        |  +- utmHAClusterBindings             { 2  }
+        |  |  +- bindHAStatusChanged           {  1 }
+        |  |  |  +- utmHAStatus                {   1}
+        |  |  |
+        |  +- utmDeviceBindings                { 4  }
+        |  |  +- bindHighCPUUsage              {  2 }
+        |  |  |  +- utmCPUUsage                {   1}
+        |  |  |
+        |  |  +- bindLowMemory                 {  3 }
+        |  |  |  +- utmMemory                  {   1}
+        |  |  |
+        |  |  +- bindLowLogdiskSpace           {  4 }
+        |  |  |  +- utmLogdiskSpace            {   1}
+        |  |  |
+        |  |  +- bindRaidStatus                {  5 }
+        |  |  |  +- utmAdaptecRaidStatus       {   1}
+        |  |  |  +- utmBroadcomRaidStatus      {   2}
+        |  |  |
+        |  |  +- bindPowerSupply               {  6 }
+        |  |  |  +- utmPowerSupply             {   1}
+        |  |  |  +- utmPowerSupplyStatus       {   2}
+        |  |  |
+        |  |  +- bindCableStatus               {  7 }
+        |  |  |  +- utmCSCIfName               {   1}
+        |  |  |  +- utmCSCStatus               {   2}
+        |  |  |
+        |  |  +- bindHighDiskIOUtilization     {  8 }
+        |  |  |  +- utmDiskIOUtilization       {   1}
+        |  |  |
+        |  +- utmAccountBindings               { 6  }
+        |  |  +- bindLDAPDown                  {  1 }
+        |  |  |  +-utmLDAPServerName           {   1}
+        |  |  |  +-utmLDAPServerAddress        {   2}
+        |  |  |
+        |  +- utmTemperatureBindings           { 7  }
+        |     +- bindCriticalTemperature       {  1 }
+        |        +- utmThermSensor             {   1}
+        |        +- utmThermValue              {   2}
+        |
+        +- utmBindingGroups                    {2   }
+           +- utmSysBindingsGroup              { 1  }
+           +- utmHAClusterBindingsGroup        { 2  }
+           +- utmDeviceBindingsGroup           { 4  }
+           +- utmAccountBindingsGroup          { 6  }
+           +- utmTemperatureBindingsGroup      { 7  }
+    "
+    ::= { utm-4 11 }
+
+utmTrapsBindingsEntities OBJECT IDENTIFIER ::=  { utmTrapsBindings 1 }
+
+utmSysBindings OBJECT IDENTIFIER ::= { utmTrapsBindingsEntities 1 }
+bindSessionsCounter OBJECT IDENTIFIER ::= { utmSysBindings 5 }
+     utmSessions OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Current number of active sessions"
+        ::= { bindSessionsCounter 1 }
+     utmSessionsMax OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Maximum number of active sessions"
+        ::= { bindSessionsCounter 2 }
+
+bindUsersCounter OBJECT IDENTIFIER ::= { utmSysBindings 6 }
+     utmUsers OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Current number of active sessions"
+        ::= { bindUsersCounter 1 }
+     utmUsersMax OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Maximum number of active sessions"
+        ::= { bindUsersCounter 2 }
+
+bindDataPartionFSStatus OBJECT IDENTIFIER ::= { utmSysBindings 7 }
+    utmDataPartionFSStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            clean(0),
+            notclean(1)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Data partition filesystem status"
+        ::= { bindDataPartionFSStatus 1 }
+
+utmHAClusterBindings OBJECT IDENTIFIER ::= { utmTrapsBindingsEntities 2 }
+bindHAStatusChanged OBJECT IDENTIFIER ::= { utmHAClusterBindings 1 }
+    utmHAStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            master(0),
+            backup(1),
+            fault(3)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Current node's status"
+        ::= { bindHAStatusChanged 1 }
+
+    utmHAStatusReason OBJECT-TYPE
+        SYNTAX      INTEGER {
+---         utm node not respinding
+            chkNode(1),
+---         utm http proxy not respinding
+            chkHttp(2),
+---         there no active gateways
+            chkFailover(3),
+---         dns server not responding
+            chkDns(4),
+---         cc node not respinding
+            chckCC(5)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The reason for HA Cluster node changing status"
+        ::= { bindHAStatusChanged 2 }
+
+
+utmIDPSBindings OBJECT IDENTIFIER ::= { utmTrapsBindingsEntities 3 }
+
+utmDeviceBindings OBJECT IDENTIFIER ::= { utmTrapsBindingsEntities 4 }
+bindHighCPUUsage OBJECT IDENTIFIER ::= { utmDeviceBindings 2 }
+    utmCPUUsage OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The CPU usage value in percentage of total amount of CPU"
+        ::= { bindHighCPUUsage 1 }
+
+bindLowMemory OBJECT IDENTIFIER ::= { utmDeviceBindings 3}
+    utmMemory OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The percentage of used memory"
+        ::= { bindLowMemory 1 }
+
+bindLowLogdiskSpace OBJECT IDENTIFIER ::= { utmDeviceBindings 4 }
+    utmLogdiskSpace OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The percentage of current log disk space usage"
+        ::= { bindLowLogdiskSpace 1 }
+
+bindRaidStatus OBJECT IDENTIFIER ::= { utmDeviceBindings 5 }
+    utmAdaptecRaidStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            optimal(0),
+            degraded(1),
+            rebuild(2)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Current status of the Adaptec raid controller"
+        ::= { bindRaidStatus 1 }
+
+    utmBroadcomRaidStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            optimal(0),
+            degraded(1),
+            partialDegraded(2),
+            failed(3),
+            offline(4)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Current status of the Broadcom raid controller"
+        ::= { bindRaidStatus 2 }
+
+
+bindPowerSupply OBJECT IDENTIFIER ::= { utmDeviceBindings 6 }
+    utmPowerSupply OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unit1(1),
+            unit2(2)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Number of power supply unit"
+        ::= { bindPowerSupply 1 }
+    utmPowerSupplyStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            off(0),
+            on(1)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Power supply unit status"
+        ::= { bindPowerSupply 2 }
+
+bindCableStatus OBJECT IDENTIFIER ::= { utmDeviceBindings 7 }
+    utmCSCIfName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  not-accessible
+        STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { bindCableStatus 1 }
+
+    utmCSCStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+            plugged(1),
+            unplugged(0)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+    DESCRIPTION "Interface's cable status 1/0 plugged/unplugged"
+    ::= { bindCableStatus 2 }
+
+bindHighDiskIOUtilization OBJECT IDENTIFIER ::= { utmDeviceBindings 8 }
+    utmDiskIOUtilization OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Current disk utilization in percentage of total disk IO"
+        ::= { bindHighDiskIOUtilization 1 }
+
+utmTrafficBindings OBJECT IDENTIFIER ::= { utmTrapsBindingsEntities 5 }
+
+utmAccountBindings OBJECT IDENTIFIER ::= { utmTrapsBindingsEntities 6 }
+bindLDAPDown OBJECT IDENTIFIER ::= { utmAccountBindings 1 }
+    utmLDAPServerName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  not-accessible
+        STATUS      current
+    DESCRIPTION "LDAP server name"
+    ::= { bindLDAPDown 1 }
+
+    utmLDAPServerAddress OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  not-accessible
+        STATUS      current
+    DESCRIPTION "LDAP Server address"
+    ::= { bindLDAPDown 2 }
+
+utmTemperatureBindings OBJECT IDENTIFIER ::=  { utmTrapsBindingsEntities 7 }
+
+bindCriticalTemperature OBJECT IDENTIFIER ::= { utmTemperatureBindings 1 }
+    utmThermSensor OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  not-accessible
+        STATUS      current
+    DESCRIPTION "Sensor name"
+    ::= { bindCriticalTemperature 1 }
+
+    utmThermValue OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+    DESCRIPTION "Temperature value measured by sensor"
+    ::= { bindCriticalTemperature 2 }
+
+
+utmBindingGroups OBJECT IDENTIFIER ::= { utmTrapsBindings 2 }
+utmSysBindingsGroup OBJECT-GROUP
+    OBJECTS {
+        utmSessions,
+        utmSessionsMax,
+        utmUsers,
+        utmUsersMax,
+        utmDataPartionFSStatus
+    }
+    STATUS current
+    DESCRIPTION "System binding group"
+    ::= {utmBindingGroups 1}
+
+
+utmHAClusterBindingsGroup OBJECT-GROUP
+    OBJECTS {
+        utmHAStatus,
+        utmHAStatusReason
+    }
+    STATUS current
+    DESCRIPTION "HA cluster binding group"
+    ::= {utmBindingGroups 2}
+
+utmDeviceBindingsGroup OBJECT-GROUP
+    OBJECTS {
+        utmCPUUsage,
+        utmMemory,
+        utmLogdiskSpace,
+        utmAdaptecRaidStatus,
+        utmBroadcomRaidStatus,
+        utmPowerSupply,
+        utmPowerSupplyStatus,
+        utmCSCIfName,
+        utmCSCStatus,
+        utmDiskIOUtilization
+    }
+    STATUS current
+    DESCRIPTION "Device binding group"
+    ::= { utmBindingGroups 4 }
+
+utmAccountBindingsGroup OBJECT-GROUP
+    OBJECTS {
+        utmLDAPServerName,
+        utmLDAPServerAddress
+    }
+    STATUS current
+    DESCRIPTION "Account binding group"
+    ::= {utmBindingGroups 6}
+END

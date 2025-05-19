@@ -1,0 +1,408 @@
+UTM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    MODULE-IDENTITY  FROM SNMPv2-SMI
+    OBJECT-GROUP     FROM SNMPv2-CONF
+    DisplayString    FROM RFC1213-MIB
+    utm-4            FROM UTM-ENTERPRISE-MIB;
+
+utmInfo MODULE-IDENTITY
+    LAST-UPDATED "202202180600Z"
+    ORGANIZATION "ENTENSYS"
+    CONTACT-INFO "support@entensys.com"
+    DESCRIPTION "Usergate traps definition.
+    Scheme:
+        utmInfo                             { utm-4 2 }
+        +-utmInfoEntities                     {1    }
+        |  +-systemInfo                       { 1   }
+        |  |  +-vcpuCount                     {  1  }
+        |  |  +-vcpuUsage                     {  2  }
+        |  |  +-usersCounter                  {  3  }
+        |  |  +-sessionsCounter               {  4  }
+        |  |  +-tcpsessionsCounter            {  5  }
+        |  |  +-udpsessionsCounter            {  6  }
+        |  |  +-icmpsessionsCounter           {  7  }
+        |  |  +-sessionsRate10                {  8  }
+        |  |  +-sessionsRate60                {  9  }
+        |  |  +-sessionsRate300               {  10 }
+        |  |  +-tcpsessionsRate10             {  11 }
+        |  |  +-tcpsessionsRate60             {  12 }
+        |  |  +-tcpsessionsRate300            {  13 }
+        |  |  +-udpsessionsRate10             {  14 }
+        |  |  +-udpsessionsRate60             {  15 }
+        |  |  +-udpsessionsRate300            {  16 }
+        |  |  +-icmpsessionsRate10            {  17 }
+        |  |  +-icmpsessionsRate60            {  18 }
+        |  |  +-icmpsessionsRate300           {  19 }
+        |  |  +-dnsRequestCounter             {  20 }
+        |  |  +-dnsBlockedRequestCounter      {  21 }
+        |  |  +-dnsRequestRate                {  22 }
+        |  |  +-httpRequestCounter            {  23 }
+        |  |  +-httpBlockedRequestCounter     {  24 }
+        |  |  +-httpRequestRate               {  25 }
+        |  |  +-dataPartitionFSStatus         {  26 }
+        |  |
+        |  +-haClusterInfo                    { 2   }
+        |  |  +- haStatus                     {  1  }
+        |  |
+        |  +-idpsInfo                         { 3   }
+        |  |
+        |  +-deviceInfo                       { 4   }
+        |  |  +-cpuLoad                       {  1  }
+        |  |  +-memoryUsed                    {  2  }
+        |  |  +-logDiskSpace                  {  3  }
+        |  |  +-powerSupply1Status            {  4  }
+        |  |  +-powerSupply2Status            {  5  }
+        |  |  +-raidType                      {  6  }
+        |  |  +-raidStatus                    {  7  }
+        |  |  +-diskIOUtilization             {  8  }
+        |  |  +-diskIOUtilization60           {  9  }
+        |  |  +-diskIOUtilization300          {  10 }
+        |  |
+        |  +-trafficInfo                      { 5   }
+        |  |
+        |  +-accountInfo                      { 6   }
+        |
+        |  +-temperatureInfo                  { 7   }
+        |
+        +- utmInfoGroups                      {2    }
+           +- systemInfoGroup                 { 1   }
+           +- haClusterInfoGroup              { 2   }
+           +- deviceInfoGroup                 { 4   }
+    "
+    ::= { utm-4 2 }
+
+
+utmInfoEntities OBJECT IDENTIFIER ::= { utmInfo  1 }
+systemInfo OBJECT IDENTIFIER ::= { utmInfoEntities 1 }
+    vcpuCount OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "System virtual CPU count"
+        ::= { systemInfo 1 }
+
+    vcpuUsage OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS      read-only
+        STATUS      current
+        DESCRIPTION "System virtual CPU used"
+        ::= { systemInfo 2 }
+
+    usersCounter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of active current users"
+        ::= { systemInfo 3 }
+
+    sessionsCounter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current count of active sessions"
+        ::= { systemInfo 4 }
+
+    tcpsessionsCounter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current count of active TCP sessions"
+        ::= { systemInfo 5 }
+
+    udpsessionsCounter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current count of active UDP sessions"
+        ::= { systemInfo 6 }
+
+    icmpsessionsCounter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current count of active ICMP sessions"
+        ::= { systemInfo 7 }
+
+    sessionsRate10 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Sessions rate per second averaged over the last 10 seconds"
+        ::= { systemInfo 8 }
+
+    sessionsRate60 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Sessions rate per second averaged over the last 60 seconds"
+        ::= { systemInfo 9 }
+
+    sessionsRate300 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Sessions rate per second averaged over the last 300 seconds"
+        ::= { systemInfo 10 }
+
+    tcpsessionsRate10 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "TCP sessions rate per second averaged over the last 10 seconds"
+        ::= { systemInfo 11 }
+
+    tcpsessionsRate60 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "TCP sessions rate per second averaged over the last 60 seconds"
+        ::= { systemInfo 12 }
+
+    tcpsessionsRate300 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "TCP sessions rate per second averaged over the last 300 seconds"
+        ::= { systemInfo 13 }
+
+    udpsessionsRate10 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "UDP sessions rate per second averaged over the last 10 seconds"
+        ::= { systemInfo 14 }
+
+    udpsessionsRate60 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "UDP sessions rate per second averaged over the last 60 seconds"
+        ::= { systemInfo 15 }
+
+    udpsessionsRate300 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "UDP sessions rate per second averaged over the last 300 seconds"
+        ::= { systemInfo 16 }
+
+    icmpsessionsRate10 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "ICMP sessions rate per second averaged over the last 10 seconds"
+        ::= { systemInfo 17 }
+
+    icmpsessionsRate60 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "ICMP sessions rate per second averaged over the last 60 seconds"
+        ::= { systemInfo 18 }
+
+    icmpsessionsRate300 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "ICMP sessions rate per second averaged over the last 300 seconds"
+        ::= { systemInfo 19 }
+
+    dnsRequestCounter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "DNS requests total"
+        ::= { systemInfo 20 }
+
+    dnsBlockedRequestCounter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "DNS requests blocked"
+        ::= { systemInfo 21 }
+
+    dnsRequestRate OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "DNS requests rate per second"
+        ::= { systemInfo 22 }
+
+    httpRequestCounter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "HTTP requests total"
+        ::= { systemInfo 23 }
+
+    httpBlockedRequestCounter OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "HTTP requests blocked"
+        ::= { systemInfo 24 }
+
+    httpRequestRate OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "HTTP requests rate per second"
+        ::= { systemInfo 25 }
+
+    dataPartitionFSStatus OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Data partition file system status"
+        ::= { systemInfo 26 }
+
+haClusterInfo OBJECT IDENTIFIER ::= { utmInfoEntities 2 }
+    haStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "HA cluster node current status"
+        ::= { haClusterInfo 1 }
+
+idpsInfo OBJECT IDENTIFIER ::= { utmInfoEntities 3 }
+
+deviceInfo OBJECT IDENTIFIER ::= { utmInfoEntities 4 }
+    cpuLoad OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "CPU usage"
+        ::= { deviceInfo 1 }
+
+    memoryUsed OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Memory usage"
+        ::= { deviceInfo 2 }
+
+    logDiskSpace OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS      read-only
+        STATUS      current
+        DESCRIPTION "Used space on log disk"
+        ::= { deviceInfo 3 }
+
+    powerSupply1Status OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Status of the 1-st Power suplpy"
+        ::= { deviceInfo 4 }
+
+    powerSupply2Status OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Status of the 2-nd Power suplpy"
+        ::= { deviceInfo 5 }
+
+    raidType OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current raid type"
+        ::= { deviceInfo 6 }
+
+    raidStatus OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current status of raid"
+        ::= { deviceInfo 7 }
+
+    diskIOUtilization OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS      read-only
+        STATUS      current
+        DESCRIPTION "Current disk utilization(%)"
+        ::= { deviceInfo 8 }
+
+    diskIOUtilization60 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS      read-only
+        STATUS      current
+        DESCRIPTION "Disk utilization(%) averaged over the last 60 seconds"
+        ::= { deviceInfo 9 }
+
+    diskIOUtilization300 OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS      read-only
+        STATUS      current
+        DESCRIPTION "Disk utilization(%) averaged over the last 300 seconds"
+        ::= { deviceInfo 10 }
+
+trafficInfo OBJECT IDENTIFIER ::= { utmInfoEntities 5 }
+accountInfo OBJECT IDENTIFIER ::= { utmInfoEntities 6 }
+temperatureInfo OBJECT IDENTIFIER ::= { utmInfoEntities 7 }
+
+
+utmInfoGroups OBJECT IDENTIFIER ::= { utmInfo  2 }
+systemInfoGroup OBJECT-GROUP
+    OBJECTS {
+        vcpuCount,
+        vcpuUsage,
+        usersCounter,
+        sessionsCounter,
+        tcpsessionsCounter,
+        udpsessionsCounter,
+        icmpsessionsCounter,
+        sessionsRate10,
+        sessionsRate60,
+        sessionsRate300,
+        tcpsessionsRate10,
+        tcpsessionsRate60,
+        tcpsessionsRate300,
+        udpsessionsRate10,
+        udpsessionsRate60,
+        udpsessionsRate300,
+        icmpsessionsRate10,
+        icmpsessionsRate60,
+        icmpsessionsRate300,
+        dnsRequestCounter,
+        dnsBlockedRequestCounter,
+        dnsRequestRate,
+        httpRequestCounter,
+        httpBlockedRequestCounter,
+        httpRequestRate,
+        dataPartitionFSStatus
+    }
+    STATUS current
+    DESCRIPTION "UTM system info group"
+    ::= {utmInfoGroups 1}
+
+haClusterInfoGroup OBJECT-GROUP
+    OBJECTS {
+        haStatus
+    }
+    STATUS current
+    DESCRIPTION "UTM high availability cluster info group"
+    ::= {utmInfoGroups 2}
+
+deviceInfoGroup OBJECT-GROUP
+    OBJECTS {
+        cpuLoad,
+        memoryUsed,
+        logDiskSpace,
+        powerSupply1Status,
+        powerSupply2Status,
+        raidType,
+        raidStatus,
+        diskIOUtilization,
+        diskIOUtilization60,
+        diskIOUtilization300
+    }
+    STATUS current
+    DESCRIPTION "UTM system info group"
+    ::= {utmInfoGroups 4}
+
+
+END
+

@@ -1,0 +1,273 @@
+UTM-TRAPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    MODULE-IDENTITY    FROM SNMPv2-SMI
+    NOTIFICATION-GROUP FROM SNMPv2-CONF
+    utm-4              FROM UTM-ENTERPRISE-MIB;
+
+utmTraps MODULE-IDENTITY
+    LAST-UPDATED "202202180600Z"
+    ORGANIZATION "ENTENSYS"
+    CONTACT-INFO "support@entensys.com"
+    DESCRIPTION "Usergate traps definition.
+    Scheme:
+        utmTraps                             { utm-4 10 }
+        +- utmTrapsEntities                    {1    }
+        |  +- utmSysInfoEntries                { 1   }
+        |  |  +- trapCoreCrush                 {  1  }
+        |  |  +- trapStatDown                  {  2  }
+        |  |  +- trapCoreBootstrapEnd          {  3  }
+        |  |  +- trapDefaultGatewayChanged     {  4  }
+        |  |  +- trapHighSessionsCounter       {  5  }
+        |  |  +- trapHighUsersCounter          {  6  }
+        |  |  +- trapDataPartitionFSStatus     {  7  }
+        |  |
+        |  +- utmHAClusterEntries              { 2   }
+        |  |  +- trapStatusChanged             {  1  }
+        |  |  +- trapMemberUp                  {  2  }
+        |  |  +- trapMemberDown                {  3  }
+        |  |
+        |  +- utmIDPSEntries                   { 3   }
+        |  |  +- trapAttackDetected            {  1  }
+        |  |
+        |  +- utmDeviceEntries                 { 4   }
+        |  |  +- trapChecksumFailed            {  1  }
+        |  |  +- trapHighCPUUsage              {  2  }
+        |  |  +- trapLowMemory                 {  3  }
+        |  |  +- trapLowLogdiskSpace           {  4  }
+        |  |  +- trapRaidStatus                {  5  }
+        |  |  +- trapPowerSupply               {  6  }
+        |  |  +- trapCableStatus               {  7  }
+        |  |  +- trapHighDiskIOUtilization     {  8  }
+        |  |
+        |  +- utmTrafficEntries                { 5   }
+        |  |  +- trapTrafficDrop               {  1  }
+        |  |
+        |  +- utmAccountEntries                { 6   }
+        |  |  +- trapLDAPServerDown            {  1  }
+        |  |
+        |  +- utmThermTraps                    { 7   }
+        |     +- trapCriticalTemperature       {  1  }
+        |
+        +- utmTrapsGroups                      {2    }
+           +- utmSysInfoGroup                  { 1   }
+           +- utmHAClusterGroup                { 2   }
+           +- utmIDPSGroup                     { 3   }
+           +- utmDeviceGroup                   { 4   }
+           +- utmTrafficGroup                  { 5   }
+           +- utmAccountGroup                  { 6   }
+           +- utmThermGroup                    { 7   }
+    "
+    ::= { utm-4 10 }
+
+--- ===================================================
+utmTrapsEntities OBJECT IDENTIFIER ::= { utmTraps 1 }
+
+--- System Info Group
+utmSysInfoEntries OBJECT IDENTIFIER ::= { utmTrapsEntities 1 }
+
+trapCoreCrush NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Notification about core crushing"
+    ::= { utmSysInfoEntries 1 }
+
+trapStatDown NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Notification about statistics server shutting down"
+    ::= { utmSysInfoEntries 2 }
+
+trapCoreBootstrapEnd NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Notification about utm-core boot finished"
+    ::= { utmSysInfoEntries 3 }
+
+trapDefaultGatewayChanged NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Default gateway IP changed"
+    ::= { utmSysInfoEntries 4 }
+
+trapHighSessionsCounter NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Active sessions number are near the limit"
+    ::= { utmSysInfoEntries 5 }
+
+trapHighUsersCounter NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Active users number are near the limit"
+    ::= { utmSysInfoEntries 6 }
+
+trapDataPartitionFSStatus NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Filesystem on data partition is not clean"
+    ::= { utmSysInfoEntries 7 }
+
+--- HA Cluster Group
+utmHAClusterEntries OBJECT IDENTIFIER ::= { utmTrapsEntities 2 }
+
+trapStatusChanged NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "HA cluster node status changed notification"
+    ::= { utmHAClusterEntries 1 }
+
+trapMemberUp NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "HA cluster node online"
+    ::= { utmHAClusterEntries 2 }
+
+trapMemberDown NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "HA cluster node offline"
+    ::= { utmHAClusterEntries 3 }
+
+--- IDPS Group
+utmIDPSEntries OBJECT IDENTIFIER ::= { utmTrapsEntities 3 }
+
+trapAttackDetected NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Notification about IDPS attack"
+    ::= { utmIDPSEntries 1 }
+
+--- DEVICE group
+utmDeviceEntries OBJECT IDENTIFIER ::= { utmTrapsEntities 4 }
+
+trapChecksumFailed NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Some files checksum failed"
+    ::= { utmDeviceEntries 1 }
+
+trapHighCPUUsage NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "High CPU usage notification"
+    ::= { utmDeviceEntries 2 }
+
+trapLowMemory NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Low memory notification"
+    ::= { utmDeviceEntries 3 }
+
+trapLowLogdiskSpace NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Low log disk space notification"
+    ::= { utmDeviceEntries 4 }
+
+trapRaidStatus NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Raid status is changed"
+    ::= { utmDeviceEntries 5 }
+
+trapPowerSupply NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Power supply unit 1 switched off"
+    ::= { utmDeviceEntries 6 }
+
+trapCableStatus NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Cable was plugged/unplugged from interface"
+    ::= { utmDeviceEntries 7 }
+
+trapHighDiskIOUtilization NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "High disk IO utilization"
+    ::= { utmDeviceEntries 8 }
+
+--- Traffic group
+utmTrafficEntries OBJECT IDENTIFIER ::= { utmTrapsEntities 5 }
+
+trapTrafficDrop NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Firewall DENY rule triggered"
+    ::= { utmTrafficEntries 1 }
+
+--- Account group
+utmAccountEntries OBJECT IDENTIFIER ::= { utmTrapsEntities 6 }
+
+trapLDAPServerDown NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "LDAP Server is not responding"
+    ::= { utmAccountEntries 1 }
+
+--- Therm group
+utmThermEntries OBJECT IDENTIFIER ::= { utmTrapsEntities 7 }
+
+trapCriticalTemperature NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION "Critical temperature on one of the sensors"
+    ::= { utmThermEntries 1 }
+
+utmTrapsGroups OBJECT IDENTIFIER ::= { utmTraps 2 }
+
+--- NOTIFICATION GROUPS
+utmSysInfoGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        trapCoreCrush,
+        trapStatDown,
+        trapCoreBootstrapEnd,
+        trapDefaultGatewayChanged,
+        trapHighSessionsCounter,
+        trapHighUsersCounter,
+        trapDataPartitionFSStatus
+    }
+    STATUS current
+    DESCRIPTION "System notification group"
+    ::= { utmTrapsGroups 1 }
+
+utmHAClusterGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        trapStatusChanged,
+        trapMemberUp,
+        trapMemberDown
+    }
+    STATUS current
+    DESCRIPTION "High availability notification group"
+    ::= { utmTrapsGroups 2 }
+
+utmIDPSGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        trapAttackDetected
+    }
+    STATUS current
+    DESCRIPTION "IDPS notification group"
+    ::= { utmTrapsGroups 3 }
+
+utmDeviceGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+         trapChecksumFailed,
+         trapHighCPUUsage,
+         trapLowMemory,
+         trapLowLogdiskSpace,
+         trapRaidStatus,
+         trapPowerSupply,
+         trapCableStatus,
+         trapHighDiskIOUtilization
+    }
+    STATUS current
+    DESCRIPTION "Device notification group"
+    ::= { utmTrapsGroups 4 }
+
+utmTrafficGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        trapTrafficDrop
+    }
+    STATUS current
+    DESCRIPTION "Traffic notification group"
+    ::= { utmTrapsGroups 5 }
+
+utmAccountGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        trapLDAPServerDown
+    }
+    STATUS current
+    DESCRIPTION "Account notification group"
+    ::= { utmTrapsGroups 6 }
+
+utmThermGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        trapCriticalTemperature
+    }
+    STATUS current
+    DESCRIPTION "Temperature notification group"
+    ::= { utmTrapsGroups 7 }
+
+END
